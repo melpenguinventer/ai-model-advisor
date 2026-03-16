@@ -22,18 +22,4 @@ An interactive tool to help you choose the right Claude model for your task and 
 ## Try It Online
 [Visit the live tool](https://melpenguinventer.github.io/claude-model-advisor)
 
-## License
-MIT
-```
 
-### **Step 5: Enable GitHub Pages**
-1. Go to repo **Settings** (top right)
-2. Click **Pages** (left sidebar)
-3. Under "Source", select **Deploy from a branch**
-4. Select **main** branch and **/root** folder
-5. Click **Save**
-
-### **Step 6: Get Your Live Link**
-After a minute, GitHub will show your site URL like:
-```
-https://yourusername.github.io/claude-model-advisor
