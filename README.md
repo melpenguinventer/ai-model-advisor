@@ -14,12 +14,10 @@ An interactive tool to help you choose the right Claude model for your task and 
 - **Claude Opus 4.6** - Deep reasoning for complex problems
 
 ## How to Use
-1. Open `index.html` in your browser
+1. Visit the link below
 2. Answer questions about your task
 3. Get a model recommendation with cost breakdown
 4. Copy the generated prompt to use in Claude
 
 ## Try It Online
 [Visit the live tool](https://melpenguinventer.github.io/claude-model-advisor)
-
-
