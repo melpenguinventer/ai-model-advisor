@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Choose the right Claude model for your task and get an optimized prompt">
-    <title>Claude Model Advisor - Choose Your Model</title>
+    <meta name="description" content="Choose the right AI model for your task - Claude, ChatGPT, Gemini, and more">
+    <title>AI Model Advisor - Find Your Perfect Model</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; }
@@ -15,8 +15,8 @@
     <div class="min-h-screen p-6 md:p-12">
         <div class="max-w-2xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">Claude Model Advisor</h1>
-                <p class="text-lg text-slate-600">Tell me what you need. I'll recommend the best model and create a custom prompt.</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">AI Model Advisor</h1>
+                <p class="text-lg text-slate-600">Compare Claude, ChatGPT, Gemini, and more. Get personalized recommendations and optimized prompts.</p>
             </div>
             <div id="app"></div>
         </div>
@@ -49,6 +49,7 @@
                         name: 'Claude Haiku 4.5',
                         description: 'Lightning-fast and affordable',
                         color: 'from-amber-400 to-orange-500',
+                        provider: 'Anthropic',
                         bestFor: ['Quick summaries', 'Simple tasks', 'Data extraction', 'Classification'],
                         costs: '$0.80 input / $4 output per 1M tokens',
                         speed: 'Fastest (50+ tok/s)',
@@ -61,6 +62,7 @@
                         name: 'Claude Sonnet 4.6',
                         description: 'The reliable workhorse',
                         color: 'from-blue-400 to-cyan-500',
+                        provider: 'Anthropic',
                         bestFor: ['Feature development', 'Content creation', 'Code review', 'Analysis'],
                         costs: '$3 input / $15 output per 1M tokens',
                         speed: 'Fast (20+ tok/s)',
@@ -73,6 +75,7 @@
                         name: 'Claude Opus 4.6',
                         description: 'Deep thinking for complex problems',
                         color: 'from-purple-400 to-pink-500',
+                        provider: 'Anthropic',
                         bestFor: ['Architecture decisions', 'Critical reviews', 'Multi-step reasoning', 'Large codebase analysis'],
                         costs: '$5 input / $25 output per 1M tokens',
                         speed: 'Slower (10+ tok/s)',
@@ -81,6 +84,45 @@
                         use: 'Reserve for truly complex, high-stakes work',
                         costPerTask: '$1-3',
                     },
+                    gpt4o: {
+                        name: 'GPT-4o',
+                        description: 'Advanced reasoning with vision capabilities',
+                        color: 'from-green-400 to-emerald-500',
+                        provider: 'OpenAI',
+                        bestFor: ['Vision/image analysis', 'Complex reasoning', 'Multimodal tasks', 'Creative writing'],
+                        costs: '$5 input / $15 output per 1M tokens',
+                        speed: 'Moderate (15+ tok/s)',
+                        accuracy: '~82% (Reasoning)',
+                        context: '128K tokens',
+                        use: 'For multimodal tasks and vision work',
+                        costPerTask: '$0.50-2',
+                    },
+                    gpt4turbo: {
+                        name: 'GPT-4 Turbo',
+                        description: 'Cost-effective reasoning',
+                        color: 'from-green-500 to-teal-600',
+                        provider: 'OpenAI',
+                        bestFor: ['Cost-conscious work', 'Coding', 'Analysis', 'General tasks'],
+                        costs: '$3 input / $15 output per 1M tokens',
+                        speed: 'Moderate (15+ tok/s)',
+                        accuracy: '~80%',
+                        context: '128K tokens',
+                        use: 'Budget-friendly reasoning alternative',
+                        costPerTask: '$0.30-1',
+                    },
+                    gemini: {
+                        name: 'Gemini Pro 2.0',
+                        description: 'Fast multimodal with long context',
+                        color: 'from-blue-500 to-purple-600',
+                        provider: 'Google',
+                        bestFor: ['Quick analysis', 'Multimodal tasks', 'Long documents', 'Budget work'],
+                        costs: '$0.075 input / $0.30 output per 1M tokens',
+                        speed: 'Very fast (40+ tok/s)',
+                        accuracy: '~78%',
+                        context: '1M tokens',
+                        use: 'Best value for long-context and multimodal',
+                        costPerTask: '$0.01-0.15',
+                    },
                 };
 
                 this.render();
@@ -88,7 +130,7 @@
 
             scoreModel() {
                 if (!this.answers.taskDescription.trim()) return null;
-                let scores = { haiku: 0, sonnet: 0, opus: 0 };
+                let scores = { haiku: 0, sonnet: 0, opus: 0, gpt4o: 0, gpt4turbo: 0, gemini: 0 };
                 let finalComplexity = this.answers.complexity;
                 if (this.complexityHelperStep > 0) {
                     const helperScore = Object.values(this.helperAnswers).filter(v => v === true).length;
@@ -96,26 +138,31 @@
                     else if (helperScore >= 2) finalComplexity = 'medium';
                     else finalComplexity = 'simple';
                 }
-                if (finalComplexity === 'simple') scores.haiku += 3;
-                if (finalComplexity === 'medium') scores.sonnet += 3;
-                if (finalComplexity === 'complex') scores.opus += 3;
-                if (finalComplexity === 'critical') scores.opus += 4;
-                if (this.answers.speed === 'instant') scores.haiku += 2;
-                if (this.answers.speed === 'fast') scores.sonnet += 2;
-                if (this.answers.speed === 'thorough') scores.opus += 1;
-                if (this.answers.budget === 'very') scores.haiku += 2;
-                if (this.answers.budget === 'somewhat') scores.sonnet += 2;
-                if (this.answers.budget === 'flexible') scores.opus += 1;
-                if (this.answers.context === 'small') scores.haiku += 1;
-                if (this.answers.context === 'medium') scores.sonnet += 1;
-                if (this.answers.context === 'large') scores.sonnet += 2;
-                if (this.answers.context === 'massive') scores.opus += 3;
-                if (this.answers.volume === 'high') scores.haiku += 1;
-                if (this.answers.volume === 'medium') scores.sonnet += 1;
-                if (this.answers.volume === 'low') scores.opus += 1;
-                if (this.answers.accuracy === 'good-enough') scores.haiku += 1;
-                if (this.answers.accuracy === 'reliable') scores.sonnet += 1;
-                if (this.answers.accuracy === 'mission-critical') scores.opus += 3;
+                if (finalComplexity === 'simple') { scores.haiku += 3; scores.gemini += 2; }
+                if (finalComplexity === 'medium') { scores.sonnet += 3; scores.gpt4turbo += 2; }
+                if (finalComplexity === 'complex') { scores.opus += 3; scores.gpt4o += 2; }
+                if (finalComplexity === 'critical') { scores.opus += 4; scores.gpt4o += 2; }
+                if (this.answers.speed === 'instant') { scores.haiku += 2; scores.gemini += 3; }
+                if (this.answers.speed === 'fast') { scores.sonnet += 2; scores.gpt4turbo += 1; }
+                if (this.answers.speed === 'thorough') { scores.opus += 1; scores.gpt4o += 1; }
+                if (this.answers.budget === 'very') { scores.haiku += 2; scores.gemini += 3; }
+                if (this.answers.budget === 'somewhat') { scores.sonnet += 2; scores.gpt4turbo += 2; }
+                if (this.answers.budget === 'flexible') { scores.opus += 1; scores.gpt4o += 1; }
+                if (this.answers.context === 'small') { scores.haiku += 1; scores.gpt4turbo += 1; }
+                if (this.answers.context === 'medium') { scores.sonnet += 1; scores.gpt4o += 1; }
+                if (this.answers.context === 'large') { scores.sonnet += 2; scores.gpt4o += 1; }
+                if (this.answers.context === 'massive') { scores.opus += 3; scores.gemini += 3; }
+                if (this.answers.volume === 'high') { scores.haiku += 1; scores.gemini += 2; }
+                if (this.answers.volume === 'medium') { scores.sonnet += 1; scores.gpt4turbo += 1; }
+                if (this.answers.volume === 'low') { scores.opus += 1; scores.gpt4o += 1; }
+                if (this.answers.accuracy === 'good-enough') { scores.haiku += 1; scores.gemini += 1; }
+                if (this.answers.accuracy === 'reliable') { scores.sonnet += 1; scores.gpt4turbo += 1; }
+                if (this.answers.accuracy === 'mission-critical') { scores.opus += 3; scores.gpt4o += 2; }
+                const taskLower = this.answers.taskDescription.toLowerCase();
+                if (taskLower.includes('vision') || taskLower.includes('image') || taskLower.includes('photo')) {
+                    scores.gpt4o += 3;
+                    scores.gemini += 2;
+                }
                 const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
                 return sorted[0][0];
             }
